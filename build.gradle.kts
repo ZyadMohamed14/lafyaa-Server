@@ -8,12 +8,20 @@ group = "com.test"
 version = "0.0.1"
 
 application {
+    mainClass.set("io.ktor.server.netty.EngineMain")  // Ensures Railway knows the main class
+
+
     mainClass = "io.ktor.server.netty.EngineMain"
 
     val isDevelopment: Boolean = project.ext.has("development")
     applicationDefaultJvmArgs = listOf("-Dio.ktor.development=$isDevelopment")
 }
-
+// ✅ Add this to ensure the JAR is executable
+tasks.jar {
+    manifest {
+        attributes["Main-Class"] = "io.ktor.server.netty.EngineMain"
+    }
+}
 repositories {
     mavenCentral()
 }

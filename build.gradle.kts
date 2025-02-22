@@ -2,25 +2,30 @@
 plugins {
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.ktor)
+    id("application")
+
 }
 
 group = "com.test"
 version = "0.0.1"
 
 application {
-    mainClass.set("io.ktor.server.netty.EngineMain")  // Ensures Railway knows the main class
-
-
-    mainClass = "io.ktor.server.netty.EngineMain"
-
+    mainClass.set("io.ktor.server.netty.EngineMain")
     val isDevelopment: Boolean = project.ext.has("development")
     applicationDefaultJvmArgs = listOf("-Dio.ktor.development=$isDevelopment")
 }
 // ✅ Add this to ensure the JAR is executable
-tasks.named<Jar>("shadowJar") {
+tasks.withType<Jar> {
     manifest {
         attributes["Main-Class"] = "io.ktor.server.netty.EngineMain"
     }
+    archiveClassifier.set("all") // Optional: Adds "all" to the JAR name
+    from(sourceSets.main.get().output)
+    dependsOn(configurations.runtimeClasspath)
+    from({
+        configurations.runtimeClasspath.get().filter { it.name.endsWith("jar") }.map { zipTree(it) }
+    })
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE // Add this line
 }
 repositories {
     mavenCentral()

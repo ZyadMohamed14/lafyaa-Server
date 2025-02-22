@@ -10,7 +10,7 @@ fun main() {
     embeddedServer(Netty, port = System.getenv("PORT")?.toInt() ?: 8080) {
         routing {
             get("/") {
-                call.respondText("Hello from server Benz 🚀")
+                call.respondText("Hello from server Benzz 🚀")
             }
         }
     }.start(wait = true)

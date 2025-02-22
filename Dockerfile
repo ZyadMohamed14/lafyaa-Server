@@ -1,11 +1,13 @@
 # Build stage
-FROM gradle:7-jdk17 AS build
-COPY --chown=gradle:gradle . /app
-WORKDIR /app
-RUN gradle build --no-daemon
+FROM gradle:latest AS BUILD_STAGE
+WORKDIR /tmp
+COPY gradle gradle
+COPY build.gradle.kts gradle.properties settings.gradle.kts gradlew ./
+COPY src src
+RUN ./gradlew --no-daemon buildFatJar
 
-# Run stage
-FROM eclipse-temurin:17-jre
-EXPOSE 8080
-COPY --from=build /app/build/libs/*.jar /app/app.jar
-ENTRYPOINT ["java", "-jar", "/app/app.jar"]
+FROM openjdk:17-jdk-slim
+EXPOSE 8080:8080
+RUN mkdir /app
+COPY --from=BUILD_STAGE /tmp/build/libs/*-all.jar /app/ktor-sample-all.jar
+ENTRYPOINT ["java","-Xlog:gc+init","-XX:+PrintCommandLineFlags","-jar","/app/ktor-sample-all.jar"]

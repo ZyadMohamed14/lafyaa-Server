@@ -17,7 +17,7 @@ application {
     applicationDefaultJvmArgs = listOf("-Dio.ktor.development=$isDevelopment")
 }
 // ✅ Add this to ensure the JAR is executable
-tasks.jar {
+tasks.named<Jar>("shadowJar") {
     manifest {
         attributes["Main-Class"] = "io.ktor.server.netty.EngineMain"
     }
